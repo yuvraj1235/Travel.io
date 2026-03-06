@@ -1,0 +1,34 @@
+# --- General ---
+.DS_Store
+.env
+.env.local
+.env.*.local
+
+# --- Frontend (Next.js / Node) ---
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.vercel
+frontend/npm-debug.log*
+
+# --- Backend (FastAPI / Python) ---
+backend/venv/
+backend/__pycache__/
+backend/*.py[cod]
+backend/*$py.class
+backend/.pytest_cache/
+backend/.ipynb_checkpoints/
+
+# --- Prisma & DB ---
+backend/prisma/migrations/
+# Only ignore migrations if you want to keep the DB history clean, 
+# but definitely ignore the SQLite local file if you ever use one:
+backend/*.db
+backend/*.db-journal
+
+# --- IDEs ---
+.vscode/
+.idea/
+*.swp
+*.swo
