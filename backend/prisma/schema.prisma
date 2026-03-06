@@ -1,0 +1,56 @@
+// backend/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  googleId     String   @unique
+  email        String   @unique
+  fullName     String?
+  profilePic   String?
+  trips        Trip[]   // Relation: One user can have many trips
+  createdAt    DateTime @default(now())
+}
+
+model Template {
+  id           Int      @id @default(autoincrement())
+  cityName     String
+  country      String
+  basePrice    Float
+  imageUrl     String
+  description  String
+  durationDays Int
+}
+
+model Trip {
+  id           Int             @id @default(autoincrement())
+  userId       Int
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destination  String
+  budgetLimit  Float
+  startDate    DateTime
+  endDate      DateTime
+  itinerary    ItineraryItem[] // Relation: One trip has many items
+  createdAt    DateTime        @default(now())
+}
+
+model ItineraryItem {
+  id              Int      @id @default(autoincrement())
+  tripId          Int
+  trip            Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  title           String
+  itemType        String   // 'flight', 'hotel', 'activity'
+  startTime       DateTime?
+  endTime         DateTime?
+  locationAddress String?
+  googlePlaceId   String?
+  photoUrl        String?
+  cost            Float    @default(0.0)
+}
