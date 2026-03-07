@@ -1,0 +1,124 @@
+.login-container{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg, #1e293b, #0f172a);
+font-family:system-ui, sans-serif;
+}
+
+.login-box{
+display:flex;
+width:900px;
+height:520px;
+background:white;
+border-radius:20px;
+overflow:hidden;
+box-shadow:0 25px 60px rgba(0,0,0,0.3);
+}
+
+.login-left{
+flex:1;
+background-image:
+linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+url("/travel-image.webp");
+
+background-size:cover;
+background-position:center;
+
+display:flex;
+flex-direction:column;
+justify-content:flex-end;
+
+padding:40px;
+color:white;
+}
+
+.login-left h1{
+font-size:36px;
+margin-bottom:10px;
+}
+
+.login-left p{
+opacity:0.9;
+}
+
+.login-right{
+flex:1;
+display:flex;
+flex-direction:column;
+justify-content:center;
+padding:50px;
+}
+
+.login-right h2{
+font-size:28px;
+margin-bottom:30px;
+}
+
+.login-form{
+display:flex;
+flex-direction:column;
+gap:15px;
+}
+
+.input{
+padding:14px 16px;
+border-radius:10px;
+border:1px solid #ddd;
+font-size:14px;
+outline:none;
+}
+
+.input:focus{
+border-color:#000;
+}
+
+.login-btn{
+margin-top:10px;
+padding:12px;
+background:#000;
+color:white;
+border:none;
+border-radius:8px;
+font-weight:600;
+cursor:pointer;
+transition:0.3s;
+}
+
+.login-btn:hover{
+background:#333;
+}
+
+.divider{
+margin:25px 0;
+text-align:center;
+color:#777;
+}
+
+.google-btn{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+
+padding:12px;
+
+border-radius:8px;
+border:1px solid #ddd;
+
+background:white;
+font-weight:500;
+cursor:pointer;
+
+transition:0.3s;
+}
+
+.google-btn:hover{
+background:#f3f3f3;
+}
+
+.google-icon{
+width:20px;
+height:20px;
+}
