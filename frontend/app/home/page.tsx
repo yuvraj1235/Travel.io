@@ -109,7 +109,7 @@ export default function Home() {
                   <CircleDollarSign size={20} />
                 </div>
                 <div className="text-left">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Avg Price</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Average Price</p>
                   <p className="text-[14px] font-black text-slate-900 leading-none">$800 - $1000</p>
                 </div>
               </div>
