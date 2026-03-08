@@ -1,6 +1,7 @@
 "use client";
 
 import "./login.css";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   return (
@@ -17,38 +18,21 @@ export default function LoginPage() {
 
           <h2>Sign in</h2>
 
-          <form className="login-form">
-
-            <input
-              type="email"
-              placeholder="Email Address"
-              className="input"
-            />
-
-            <input
-              type="password"
-              placeholder="Password"
-              className="input"
-            />
-
-            <button className="login-btn">
-              Sign In
-            </button>
-
-          </form>
-
           <div className="divider">
             <span>or</span>
           </div>
 
-          <button className="google-btn">
-  <img
-    src="https://developers.google.com/identity/images/g-logo.png"
-    alt="google"
-    className="google-icon"
-  />
-  Continue with Google
-</button>
+          <button
+            className="google-btn"
+            onClick={() => signIn("google", { callbackUrl: "/google" })}
+          >
+            <img
+              src="https://developers.google.com/identity/images/g-logo.png"
+              alt="google"
+              className="google-icon"
+            />
+            Continue with Google
+          </button>
 
         </div>
 

@@ -1,12 +1,10 @@
-// backend/prisma/schema.prisma
-
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client-py"
 }
 
 datasource db {
   provider = "postgresql"
-  
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -15,7 +13,7 @@ model User {
   email        String   @unique
   fullName     String?
   profilePic   String?
-  trips        Trip[]   // Relation: One user can have many trips
+  trips        Trip[]
   createdAt    DateTime @default(now())
 }
 
@@ -30,15 +28,16 @@ model Template {
 }
 
 model Trip {
-  id           Int             @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
   userId       Int
-  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   destination  String
   budgetLimit  Float
   startDate    DateTime
   endDate      DateTime
-  itinerary    ItineraryItem[] // Relation: One trip has many items
-  createdAt    DateTime        @default(now())
+  photoUrl     String?   // add this line
+  itinerary    ItineraryItem[]
+  createdAt    DateTime  @default(now())
 }
 
 model ItineraryItem {
@@ -46,7 +45,7 @@ model ItineraryItem {
   tripId          Int
   trip            Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
   title           String
-  itemType        String   // 'flight', 'hotel', 'activity'
+  itemType        String
   startTime       DateTime?
   endTime         DateTime?
   locationAddress String?

@@ -2,14 +2,14 @@
 from fastapi import APIRouter
 from src.database import db
 from src.schemas.request_models import TripCreateRequest
-from backend.src.services.photo_service import get_destination_photo
+from src.services.photo_service import get_city_photo
 
 router = APIRouter()
 
 @router.post("/")
 async def create_trip(data: TripCreateRequest):
     # Automatically get a photo for the trip card
-    photo_url = await get_destination_photo(data.destination)
+    photo_url = await get_city_photo(data.destination)
     
     new_trip = await db.trip.create(
         data={
