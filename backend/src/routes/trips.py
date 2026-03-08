@@ -2,7 +2,7 @@
 from fastapi import APIRouter
 from src.database import db
 from src.schemas.request_models import TripCreateRequest
-from src.services.google_api import get_destination_photo
+from backend.src.services.photo_service import get_destination_photo
 
 router = APIRouter()
 

@@ -2,7 +2,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.database import connect_db, disconnect_db
 from src.routes import auth, trips, itinerary
+import os
+from dotenv import load_dotenv
 
+load_dotenv() # This loads the variables from the .env file
+
+db_url = os.getenv("DATABASE_URL")
+google_key = os.getenv("GOOGLE_MAPS_API_KEY")
 app = FastAPI(title="AI Travel Planner API")
 
 # --- CORS (Crucial for Next.js Connection) ---
