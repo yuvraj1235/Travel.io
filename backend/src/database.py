@@ -1,7 +1,5 @@
-# backend/db.py
 from prisma import Prisma
 
-# Global instance of the Prisma client
 db = Prisma()
 
 async def connect_db():
