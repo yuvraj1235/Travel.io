@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from src.database import db
+from pydantic import BaseModel
 
 router = APIRouter()
 
@@ -14,9 +15,9 @@ async def get_itinerary(trip_id: int):
 async def add_activity(data: dict):
     return await db.itineraryitem.create(
         data={
-            'tripId': data['tripId'],
+            'tripId': int(data['tripId']),
             'title': data['title'],
-            'itemType': data['type'], # e.g., 'flight' or 'hotel'
+            'itemType': data['type'],
             'cost': float(data.get('cost', 0))
         }
     )
