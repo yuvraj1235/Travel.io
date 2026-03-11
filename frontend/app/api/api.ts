@@ -1,3 +1,5 @@
+// frontend/src/app/api/api.ts
+
 const API_BASE_URL = "http://localhost:8000/api";
 
 const handleResponse = async (res: Response) => {
@@ -22,16 +24,23 @@ export const tripApi = {
       body: JSON.stringify(tripData),
     }).then(handleResponse),
 };
-// frontend/src/lib/api.ts
+
+// frontend/src/app/api/api.ts
+
 export const itineraryApi = {
-  // ... other methods
-  addActivity: async (activity: { tripId: number; title: string; type: string; cost: number }) => {
-    const response = await fetch(`http://localhost:8000/api/itinerary/`, {
+  getItinerary: (tripId: string | number) => 
+    fetch(`${API_BASE_URL}/itinerary/${tripId}`).then(handleResponse),
+
+  // FIX: Pass the object directly so 'itemType' isn't lost or renamed
+  addActivity: (activity: { tripId: number; title: string; itemType: string; cost: number }) => 
+    fetch(`${API_BASE_URL}/itinerary/item`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(activity),
-    });
-    if (!response.ok) throw new Error("Failed to add activity");
-    return response.json();
-  },
+      body: JSON.stringify(activity), // This will send {"itemType": "..."}
+    }).then(handleResponse),
+
+  deleteActivity: (itemId: number) =>
+    fetch(`${API_BASE_URL}/itinerary/item/${itemId}`, {
+      method: "DELETE",
+    }).then(handleResponse),
 };

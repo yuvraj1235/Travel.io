@@ -1,48 +1,48 @@
+# backend/src/routes/trips.py
+from pydantic import BaseModel, EmailStr
+from datetime import date, datetime
 from fastapi import APIRouter, HTTPException
 from src.database import db
-from pydantic import BaseModel
-from datetime import date
-from typing import Optional
 from src.services.photo_service import get_city_photo
+
 router = APIRouter()
 
-# Schema for Trip Creation
 class TripCreateRequest(BaseModel):
-    userId: int
+    userEmail: EmailStr
     destination: str
     budgetLimit: float
     startDate: date
     endDate: date
 
-# backend/src/routes/trips.py
-
-# backend/src/routes/trips.py
-
 @router.post("/")
 async def create_trip(data: TripCreateRequest):
-    # Ensure the photo service is imported and working
-    photo_url = await get_city_photo(data.destination)
+    # 1. Find the real User ID based on the email from the session
+    user = await db.user.find_unique(where={'email': data.userEmail})
     
-    # Helper to convert date to full ISO-8601 DateTime string
-    def to_iso_datetime(d):
-        return f"{d.isoformat()}T00:00:00Z"
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found. Please log in again.")
 
+    # 2. Fetch the photo (ensure your service returns a string URL)
+    photo_url = await get_city_photo(data.destination)
+
+    # 3. Create the Trip linked to the User
+    # Note: We convert date to datetime objects for Prisma compatibility
     new_trip = await db.trip.create(
         data={
             'destination': data.destination,
             'budgetLimit': data.budgetLimit,
-            'startDate': to_iso_datetime(data.startDate),
-            'endDate': to_iso_datetime(data.endDate),
+            'startDate': datetime.combine(data.startDate, datetime.min.time()),
+            'endDate': datetime.combine(data.endDate, datetime.min.time()),
             'photoUrl': photo_url,
-            # Fix: Connect to the user relation instead of just passing userId
             'user': {
                 'connect': {
-                    'id': data.userId
+                    'id': user.id 
                 }
             }
         }
     )
     return new_trip
+
 @router.get("/details/{trip_id}")
 async def get_trip_details(trip_id: int):
     trip = await db.trip.find_unique(where={'id': trip_id})
@@ -55,7 +55,3 @@ async def get_trip_details(trip_id: int):
         "price": trip.budgetLimit,
         "date": trip.startDate.strftime("%m/%d/%Y") if trip.startDate else "TBD"
     }
-
-@router.get("/user/{user_id}")
-async def get_user_trips(user_id: int):
-    return await db.trip.find_many(where={'userId': user_id})

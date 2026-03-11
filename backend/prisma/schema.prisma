@@ -1,24 +1,34 @@
 generator client {
-  provider = "prisma-client-py"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
- // url      = env("DATABASE_URL")
+  // url      = env("DATABASE_URL")
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  googleId     String   @unique
-  email        String   @unique
-  fullName     String?
-  profilePic   String?
-  trips        Trip[]
-  createdAt    DateTime @default(now())
+  id             Int             @id @default(autoincrement())
+  email          String          @unique
+  fullName       String
+  profilePic     String?
+  googleId       String          @unique
+  createdAt      DateTime        @default(now())
+  trips          Trip[]
+  userPreference UserPreference?
+}
+
+model UserPreference {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @unique
+  preferredClimate String? // e.g., Tropical, Cold, Urban
+  budgetLevel      String? // e.g., Budget, Luxury, Mid-range
+  activities       String[] // e.g., ["Hiking", "Museums", "Nightlife"]
+  user             User     @relation(fields: [userId], references: [id])
 }
 
 model Template {
-  id           Int      @id @default(autoincrement())
+  id           Int    @id @default(autoincrement())
   cityName     String
   country      String
   basePrice    Float
@@ -28,22 +38,23 @@ model Template {
 }
 
 model Trip {
-  id           Int      @id @default(autoincrement())
-  userId       Int
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  destination  String
-  budgetLimit  Float
-  startDate    DateTime
-  endDate      DateTime
-  photoUrl     String?   // add this line
-  itinerary    ItineraryItem[]
-  createdAt    DateTime  @default(now())
+  id          Int             @id @default(autoincrement())
+  userId      Int
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destination String
+  budgetLimit Float
+  totalSpent  Float           @default(0.0) // Must have a default!
+  startDate   DateTime
+  endDate     DateTime
+  photoUrl    String? // add this line
+  itinerary   ItineraryItem[]
+  createdAt   DateTime        @default(now())
 }
 
 model ItineraryItem {
-  id              Int      @id @default(autoincrement())
+  id              Int       @id @default(autoincrement())
   tripId          Int
-  trip            Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  trip            Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
   title           String
   itemType        String
   startTime       DateTime?
@@ -51,5 +62,5 @@ model ItineraryItem {
   locationAddress String?
   googlePlaceId   String?
   photoUrl        String?
-  cost            Float    @default(0.0)
+  cost            Float     @default(0.0)
 }
