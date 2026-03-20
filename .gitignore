@@ -19,6 +19,8 @@ backend/*.py[cod]
 backend/*$py.class
 backend/.pytest_cache/
 backend/.ipynb_checkpoints/
+**/__pycache__/
+
 
 # --- Prisma & DB ---
 backend/prisma/migrations/
