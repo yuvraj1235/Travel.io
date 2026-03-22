@@ -1,0 +1,70 @@
+═══════════════════════════════════════════════════════════════
+  HOW TO START THE BACKEND
+═══════════════════════════════════════════════════════════════
+
+QUICK START (Copy & Paste):
+────────────────────────────
+
+1. Open PowerShell (or use existing one)
+
+2. Go to backend folder:
+   cd "c:\Users\ROSHINI\Desktop\Travel-Planner\Travel.io\backend"
+
+3. Start the server:
+   python -m uvicorn src.main:app --reload --port 8000
+
+4. Look for this message:
+   "Uvicorn running on http://127.0.0.1:8000"
+   "Application startup complete"
+
+5. That's it! Backend is running!
+
+═══════════════════════════════════════════════════════════════
+
+WHAT TO EXPECT:
+────────────────
+
+You should see:
+✓ INFO:     Uvicorn running on http://127.0.0.1:8000
+✓ INFO:     Application startup complete
+✓ INFO:     Started server process [xxxxx]
+
+If you see these = Backend is working! ✅
+
+═══════════════════════════════════════════════════════════════
+
+IF PYTHON NOT FOUND:
+────────────────────
+
+Run this first:
+  pip install -r requirements.txt
+
+Then try starting again.
+
+═══════════════════════════════════════════════════════════════
+
+IF PORT 8000 IS BUSY:
+──────────────────────
+
+Close other PowerShell windows
+Wait 10 seconds
+Try again
+
+═══════════════════════════════════════════════════════════════
+
+TEST IF IT WORKS:
+──────────────────
+
+Open browser, go to:
+  http://localhost:8000/docs
+
+You should see the API documentation page.
+If you see it = Backend works! ✅
+
+═══════════════════════════════════════════════════════════════
+
+KEEP THE POWERSHELL WINDOW OPEN!
+
+Don't close it while using the app.
+
+═══════════════════════════════════════════════════════════════

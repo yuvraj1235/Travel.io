@@ -2,10 +2,16 @@
 from pydantic import BaseModel, EmailStr
 from datetime import date, datetime
 from fastapi import APIRouter, HTTPException
-from src.database import db
 from src.services.photo_service import get_city_photo
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+# ===== MOCK DATA FOR LOCAL DEVELOPMENT =====
+MOCK_TRIPS = {}
+NEXT_TRIP_ID = 1
 
 class TripCreateRequest(BaseModel):
     userEmail: EmailStr
@@ -16,42 +22,47 @@ class TripCreateRequest(BaseModel):
 
 @router.post("/")
 async def create_trip(data: TripCreateRequest):
-    # 1. Find the real User ID based on the email from the session
-    user = await db.user.find_unique(where={'email': data.userEmail})
+    """Create a new trip"""
+    global NEXT_TRIP_ID
     
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found. Please log in again.")
-
-    # 2. Fetch the photo (ensure your service returns a string URL)
+    # Fetch the photo
     photo_url = await get_city_photo(data.destination)
 
-    # 3. Create the Trip linked to the User
-    # Note: We convert date to datetime objects for Prisma compatibility
-    new_trip = await db.trip.create(
-        data={
-            'destination': data.destination,
-            'budgetLimit': data.budgetLimit,
-            'startDate': datetime.combine(data.startDate, datetime.min.time()),
-            'endDate': datetime.combine(data.endDate, datetime.min.time()),
-            'photoUrl': photo_url,
-            'user': {
-                'connect': {
-                    'id': user.id 
-                }
-            }
-        }
-    )
+    # Create the Trip
+    trip_id = NEXT_TRIP_ID
+    NEXT_TRIP_ID += 1
+    
+    new_trip = {
+        'id': trip_id,
+        'destination': data.destination,
+        'budgetLimit': data.budgetLimit,
+        'startDate': datetime.combine(data.startDate, datetime.min.time()),
+        'endDate': datetime.combine(data.endDate, datetime.min.time()),
+        'photoUrl': photo_url,
+        'userEmail': data.userEmail,
+        'totalSpent': 0.0,
+        'createdAt': datetime.now()
+    }
+    
+    MOCK_TRIPS[trip_id] = new_trip
     return new_trip
+
+@router.get("/user/{user_email}")
+async def get_user_trips(user_email: str):
+    """Get all trips for a user"""
+    user_trips = [trip for trip in MOCK_TRIPS.values() if trip['userEmail'] == user_email]
+    return user_trips
 
 @router.get("/details/{trip_id}")
 async def get_trip_details(trip_id: int):
-    trip = await db.trip.find_unique(where={'id': trip_id})
+    """Get trip details"""
+    trip = MOCK_TRIPS.get(trip_id)
     if not trip:
         raise HTTPException(status_code=404, detail="Trip not found")
     
     return {
-        "destination": trip.destination,
-        "image": trip.photoUrl,
-        "price": trip.budgetLimit,
-        "date": trip.startDate.strftime("%m/%d/%Y") if trip.startDate else "TBD"
+        "destination": trip['destination'],
+        "image": trip['photoUrl'],
+        "price": trip['budgetLimit'],
+        "date": trip['startDate'].strftime("%m/%d/%Y") if trip['startDate'] else "TBD"
     }

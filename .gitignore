@@ -3,6 +3,12 @@
 .env
 .env.local
 .env.*.local
+.env.*.example
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
 
 # --- Frontend (Next.js / Node) ---
 frontend/node_modules/
@@ -11,13 +17,25 @@ frontend/out/
 frontend/build/
 frontend/.vercel
 frontend/npm-debug.log*
+frontend/yarn-error.log*
+frontend/*.pem
+frontend/.env.example
 
 # --- Backend (FastAPI / Python) ---
 backend/venv/
+backend/env/
+backend/.venv/
 backend/__pycache__/
 backend/*.py[cod]
 backend/*$py.class
 backend/.pytest_cache/
+backend/.mypy_cache/
+backend/dist/
+backend/build/
+backend/*.egg-info/
+backend/.python-version
+backend/prisma/migrations/
+backend/.env.example
 backend/.ipynb_checkpoints/
 **/__pycache__/
 

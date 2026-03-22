@@ -1,11 +1,22 @@
 from fastapi import APIRouter, HTTPException
-from src.database import db
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-import hashlib
+import bcrypt
 
 router = APIRouter()
 
+# ===== MOCK DATA FOR LOCAL DEVELOPMENT =====
+# In production, this will be stored in database
+MOCK_USERS = {
+    "test@example.com": {
+        "id": 1,
+        "email": "test@example.com",
+        "password": bcrypt.hashpw(b"password123", bcrypt.gensalt()).decode(),
+        "fullName": "Test User"
+    }
+}
+
+MOCK_PREFERENCES = {}
 
 # =========================
 # 🔐 SCHEMAS
@@ -15,11 +26,9 @@ class SignupSchema(BaseModel):
     email: EmailStr
     password: str
 
-
 class LoginSchema(BaseModel):
     email: EmailStr
     password: str
-
 
 class GoogleAuthSchema(BaseModel):
     email: EmailStr
@@ -27,18 +36,18 @@ class GoogleAuthSchema(BaseModel):
     image: Optional[str] = None
     googleId: str
 
-
 # =========================
-# 🔐 HELPER FUNCTIONS (NO BCRYPT)
+# 🔐 HELPER FUNCTIONS
 # =========================
 
 def hash_password(password: str):
-    return hashlib.sha256(password.encode()).hexdigest()
-
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
 def verify_password(plain, hashed):
-    return hashlib.sha256(plain.encode()).hexdigest() == hashed
-
+    try:
+        return bcrypt.checkpw(plain.encode(), hashed.encode())
+    except:
+        return False
 
 # =========================
 # 🔐 SIGNUP (EMAIL)
@@ -46,25 +55,27 @@ def verify_password(plain, hashed):
 
 @router.post("/signup")
 async def signup(data: SignupSchema):
-    existing_user = await db.user.find_unique(where={"email": data.email})
-
-    if existing_user:
+    """Register a new user"""
+    
+    # Check if user already exists
+    if data.email in MOCK_USERS:
         raise HTTPException(status_code=400, detail="User already exists")
 
+    # Create new user
+    new_id = len(MOCK_USERS) + 1
     hashed_password = hash_password(data.password)
-
-    user = await db.user.create(
-        data={
-            "email": data.email,
-            "password": hashed_password,
-        }
-    )
+    
+    MOCK_USERS[data.email] = {
+        "id": new_id,
+        "email": data.email,
+        "password": hashed_password,
+        "fullName": data.email.split("@")[0]
+    }
 
     return {
         "message": "Signup successful",
-        "user_id": user.id
+        "user_id": new_id
     }
-
 
 # =========================
 # 🔐 LOGIN (EMAIL)
@@ -72,69 +83,75 @@ async def signup(data: SignupSchema):
 
 @router.post("/login")
 async def login(data: LoginSchema):
-    user = await db.user.find_unique(where={"email": data.email})
-
+    """Login with email and password"""
+    
+    user = MOCK_USERS.get(data.email)
+    
     if not user:
-        raise HTTPException(status_code=400, detail="User not found")
+        raise HTTPException(status_code=400, detail="User not found. Try signing up!")
 
-    if not user.password:
-        raise HTTPException(status_code=400, detail="Use Google login")
-
-    if not verify_password(data.password, user.password):
+    if not verify_password(data.password, user["password"]):
         raise HTTPException(status_code=400, detail="Invalid password")
 
     return {
         "message": "Login successful",
-        "user_id": user.id
+        "user_id": user["id"],
+        "email": user["email"]
     }
 
-
 # =========================
-# 🔐 GOOGLE LOGIN (UNCHANGED)
+# 🔐 GOOGLE LOGIN
 # =========================
 
 @router.post("/google")
 async def google_auth(data: GoogleAuthSchema):
-    user = await db.user.find_unique(where={"email": data.email})
+    """Google OAuth - creates or updates user"""
+    
+    user = MOCK_USERS.get(data.email)
 
     if not user:
-        raise HTTPException(
-            status_code=400,
-            detail="User not registered. Please signup first."
-        )
-
+        # Create new user from Google
+        new_id = len(MOCK_USERS) + 1
+        MOCK_USERS[data.email] = {
+            "id": new_id,
+            "email": data.email,
+            "password": None,  # Google auth users have no password
+            "fullName": data.name
+        }
+        return {
+            "status": "success",
+            "user_id": new_id,
+            "message": "New user created via Google"
+        }
+    
     return {
         "status": "success",
-        "user_id": user.id
+        "user_id": user["id"],
+        "message": "Logged in via Google"
     }
-
 
 # =========================
 # ⚙️ USER PREFERENCES
 # =========================
 
 @router.post("/preferences")
-async def save_preferences(data: dict):
-    user = await db.user.find_unique(where={"email": data["email"]})
-
-    if not user:
+async def save_preferences(email: str, data: dict):
+    """Save user preferences"""
+    
+    if email not in MOCK_USERS:
         raise HTTPException(status_code=404, detail="User not found")
 
-    prefs = await db.userpreference.upsert(
-        where={"userId": user.id},
-        data={
-            "create": {
-                "userId": user.id,
-                "preferredClimate": data["climate"],
-                "budgetLevel": data["budget"],
-                "activities": data["activities"]
-            },
-            "update": {
-                "preferredClimate": data["climate"],
-                "budgetLevel": data["budget"],
-                "activities": data["activities"]
-            }
-        }
-    )
+    MOCK_PREFERENCES[email] = {
+        "preferredClimate": data.get("climate"),
+        "budgetLevel": data.get("budget"),
+        "activities": data.get("activities", [])
+    }
 
     return {"message": "Preferences saved successfully"}
+
+@router.get("/preferences/{email}")
+async def get_preferences(email: str):
+    """Get user preferences"""
+    
+    prefs = MOCK_PREFERENCES.get(email, {})
+    return prefs or {"message": "No preferences set yet"}

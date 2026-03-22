@@ -1,7 +1,19 @@
 # backend/requirements.txt
-fastapi
-uvicorn
-prisma
-python-dotenv
-google-auth
-pydantic
+# Core FastAPI
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+
+# Database - Prisma
+prisma>=0.13.0
+
+# Configuration
+python-dotenv>=1.0.0
+
+# Authentication & Security
+bcrypt>=4.1.0
+PyJWT>=2.8.0
+
+# Data Validation
+pydantic>=2.0.0
+pydantic[email]>=2.0.0

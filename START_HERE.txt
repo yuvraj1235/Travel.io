@@ -1,0 +1,100 @@
+========================================
+  TRAVEL PLANNER - SIMPLE START GUIDE
+========================================
+
+⚠️ ONLY DO THIS ONCE AT THE START:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Download & Install Node.js
+   - Go to https://nodejs.org  
+   - Click LTS button
+   - Run installer, keep clicking Next
+   - RESTART your computer OR close all PowerShell windows
+
+2. Verify Installation
+   - Open PowerShell
+   - Type: node --version
+   - You should see a number (like v20.0.0)
+
+========================================
+  TO START THE PROJECT EVERY TIME:
+========================================
+
+WINDOW 1 - Start Backend:
+────────────────────────
+1. Open PowerShell
+2. Copy-paste this:
+   cd "c:\Users\ROSHINI\Desktop\Travel-Planner\Travel.io\backend"
+3. Copy-paste one of these (first time only):
+   pip install -r requirements.txt
+4. Copy-paste:
+   python -m uvicorn src.main:app --reload --port 8000
+5. Look for: "Application startup complete"
+6. Keep this window OPEN
+
+WINDOW 2 - Start Frontend:
+──────────────────────────
+1. Open a NEW PowerShell
+2. Copy-paste this:
+   cd "c:\Users\ROSHINI\Desktop\Travel-Planner\Travel.io\frontend"
+3. First time only:
+   npm install
+4. Copy-paste:
+   npm run dev
+5. Look for: "http://localhost:3000"
+6. Keep this window OPEN
+
+WINDOW 3 - Open Your App:
+──────────────────────────
+1. Open your web browser
+2. Go to: http://localhost:3000
+3. That's it! Your app is running!
+
+========================================
+  TESTING THE APP:
+========================================
+
+Click Login and try:
+  Email: test@example.com
+  Password: anything
+
+It works! No real accounts needed.
+
+Try creating a trip:
+  - Destination: Paris
+  - Dates: Any dates
+  - Budget: $1000
+
+It saves locally!
+
+========================================
+  IMPORTANT REMINDERS:
+========================================
+
+✓ Keep BOTH PowerShell windows open while using the app
+✓ If you close them, just repeat WINDOW 1 & WINDOW 2
+✓ When you make code changes, servers auto-reload!
+✓ If port is busy, close PowerShells and wait 30 seconds
+
+========================================
+  IF SOMETHING BREAKS:
+========================================
+
+❌ Backend won't start?
+   Go back to WINDOW 1, copy:
+   pip install -r requirements.txt
+
+❌ Frontend won't install?
+   Go back to WINDOW 2, copy:
+   npm install
+
+❌ Nothing works?
+   Close both PowerShells
+   Wait 10 seconds
+   Repeat WINDOW 1 & WINDOW 2
+
+========================================
+
+That's it! You're all set! 🎉
+
+Questions? See RUNME.md for more details.
