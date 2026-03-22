@@ -10,9 +10,10 @@ datasource db {
 model User {
   id             Int             @id @default(autoincrement())
   email          String          @unique
-  fullName       String
+  fullName       String?         // ✅ optional (for email users)
   profilePic     String?
-  googleId       String          @unique
+  googleId       String? @unique // ✅ optional (only for Google users)
+  password       String?         // ✅ NEW (for email login)
   createdAt      DateTime        @default(now())
   trips          Trip[]
   userPreference UserPreference?
@@ -21,9 +22,9 @@ model User {
 model UserPreference {
   id               Int      @id @default(autoincrement())
   userId           Int      @unique
-  preferredClimate String? // e.g., Tropical, Cold, Urban
-  budgetLevel      String? // e.g., Budget, Luxury, Mid-range
-  activities       String[] // e.g., ["Hiking", "Museums", "Nightlife"]
+  preferredClimate String?
+  budgetLevel      String?
+  activities       String[]
   user             User     @relation(fields: [userId], references: [id])
 }
 
@@ -43,10 +44,10 @@ model Trip {
   user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   destination String
   budgetLimit Float
-  totalSpent  Float           @default(0.0) // Must have a default!
+  totalSpent  Float           @default(0.0)
   startDate   DateTime
   endDate     DateTime
-  photoUrl    String? // add this line
+  photoUrl    String?
   itinerary   ItineraryItem[]
   createdAt   DateTime        @default(now())
 }

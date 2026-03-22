@@ -1,44 +1,63 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 const handler = NextAuth({
   providers: [
+    // 🔹 Google Login (keep as is)
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
-  ],
-  callbacks: {
-    // ✅ Fix 1: destructure `account` to get the real Google ID
-    async signIn({ user, account }) {
-      try {
-        const response = await fetch("http://localhost:8000/api/auth/google", {
+
+    // 🔹 Email + Password Login
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: {},
+        password: {},
+      },
+      async authorize(credentials) {
+        const res = await fetch("http://127.0.0.1:8000/api/auth/login", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
-            email: user.email,
-            name: user.name,
-            image: user.image,
-            googleId: account?.providerAccountId, // ✅ Fix 1: was missing entirely
+            email: credentials?.email,
+            password: credentials?.password,
           }),
         });
 
-        if (response.ok) return true;
+        const data = await res.json();
 
-        const err = await response.json();
-        console.error("FastAPI rejected login:", err);
-        return false;
-      } catch (error) {
-        console.error("Backend connection failed:", error);
-        return false;
+        if (!res.ok) {
+          throw new Error(data.detail || "Login failed");
+        }
+
+        return {
+          id: data.user_id,
+          email: credentials?.email,
+        };
+      },
+    }),
+  ],
+
+  session: {
+    strategy: "jwt",
+  },
+
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
       }
+      return token;
     },
 
-    // ✅ Fix 2: properly populate session from token
     async session({ session, token }) {
       if (session.user) {
-        session.user.email = token.email ?? "";
-        (session.user as any).id = token.sub; // ✅ Fix 2: expose Google UID to frontend
+        session.user.id = token.id as string;
       }
       return session;
     },
